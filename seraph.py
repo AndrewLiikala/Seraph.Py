@@ -9,22 +9,32 @@ class Seraph(object):
         self.data = self.a.get('https://angel.starkstate.edu/default.asp')
 
     def courseList(self):
-        x = self.data.text
-        a = x.find('<strong>Courses</strong>')
-        b = x.find('</ul><div style="text-align:right">')
-        c = x[a+24:b-7]
-        d = boa(c)
-        d.scrapeByTag('<span>')
-        e = d.instances
-        #aa = boa(c)
-        #aa.scrapeByTag('<a>')
-        #f = aa.instances
-        #g = len(f) - 1
-        #h = 0
-        #while h != g:
-         #   e[h]['classURL'] = f[0]['href']
-          #  h = h + 1
-        return e
+        a = boa(self.data.text)
+        b = a.getTagLocations('<ul>')
+        c = a.getTagProperties(b)
+        d = len(c) - 1
+        e = []
+        while d != -1: #Starts search at bottom of array, shoudln't make much of a difference
+            if 'class' in c[d]['parameters']:
+                if c[d]['class'] == 'mktree':
+                    e.append(c[d])
+            d = d - 1
+        if len(e)==0: #Error Checking-ish
+            print 'No Parameters Were Found'
+        elif len(e)>1:
+            print 'Multiple tags share the same parameter value!'
+        f = e[0]['content']
+        a = boa(f)
+        b = a.getTagLocations('<a>')
+        c = a.getTagProperties(b)
+        d = a.getTagLocations('<span>')
+        e = a.getTagProperties(d)
+        f = 0
+        g = {}
+        while f!=5:
+            g[e[f]['content']] = c[f]['href']
+            f = f + 1
+        return g
 
     def userData(self):
         x = self.data.text
@@ -97,9 +107,9 @@ class Seraph(object):
     def close(self):  #Closes the Requests Session
         self.a.close()
 
-s = Seraph("###", "###")
+s = Seraph("aliikala0518", "apl.279021")
 y = s.courseList()
-print y[1]
+print y
 s.close()
 
 
